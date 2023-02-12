@@ -11,9 +11,9 @@ const actionSchema = new mongoose.Schema({
         maxLength: [200, 'Description should be no longer than 200 characters'],
     },
     category: {
-        tyep: String,
+        type: String,
         required: [true, 'Category is required'],
-        enum: ['Vehicles', 'Real Estate', 'Electronics', 'Furniture', 'Other']
+        enum: ['vehicles', 'estate', 'electronics', 'furniture', 'other'],
     },
     image: {
         type: String
@@ -22,8 +22,8 @@ const actionSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'Price is required'],
         validate: {
-            validator: function(value){
-                return value >0;
+            validator: function (value) {
+                return value > 0;
             },
             message: 'Price should be positive number',
         },
@@ -38,3 +38,7 @@ const actionSchema = new mongoose.Schema({
         ref: 'User',
     }
 });
+
+const Action = mongoose.model('Action', actionSchema);
+
+module.exports = Action;

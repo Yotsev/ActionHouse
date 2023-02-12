@@ -50,6 +50,13 @@
                 </ul>
             </nav>
         </header>
+        {{#if errors}}
+        <div class="error-box">
+            {{#each errors}}
+            <p>{{this}}</p>
+            {{/each}}
+        </div>
+        {{/if}}
         {{{body}}}
         <footer>SoftUni &copy; 2022 | Design by Viktor Kostadinov</footer>
     </div>

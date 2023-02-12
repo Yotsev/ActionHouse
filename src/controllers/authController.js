@@ -2,7 +2,6 @@ const authController = require('express').Router();
 const authService = require('../services/authService');
 const { parseError } = require('../utils/errorParser');
 
-//Get Register Page
 authController.get('/register', (req, res) => {
     res.render('auth/register');
 });
@@ -24,7 +23,7 @@ authController.post('/register', async (req, res) => {
         res.redirect('/');
     } catch (err) {
         console.log(err);
-        return res.status(400).render('auth/register', {error: parseError(err)});
+        return res.status(400).render('auth/register', {errors: parseError(err)});
     }
 });
 
@@ -41,7 +40,7 @@ authController.post('/login', async (req, res) => {
         res.cookie('auth', token);
         res.redirect('/');
     } catch (err) {
-        return res.status(404).render('auth/login', { error: getErrorMessage(err) });
+        return res.status(404).render('auth/login', { errors: parseError(err) });
     }
 });
 
