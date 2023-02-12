@@ -6,6 +6,12 @@ exports.getAllAds = async()=> {
     return ads;
 };
 
+exports.getAdById = async (id)=> {
+    const ad = await Action.findById(id).populate('bidder').lean();
+
+    return ad;
+};
+
 exports.publishAd = async (ad)=> {
     await Action.create(ad);
 };
