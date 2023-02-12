@@ -4,8 +4,12 @@ const { isAuthenticated } = require('../middlewares/authMiddleware');
 const actionService = require('../services/actionService');
 const { parseError } = require('../utils/errorParser');
 
-actionRouter.get('/browse', (req, res) => {
-    res.render('action/browse');
+actionRouter.get('/browse', async (req, res) => {
+    const ads = await actionService.getAllAds();
+    const hasAds = ads.length > 0;
+    
+
+    res.render('action/browse', { ads, hasAds });
 });
 
 actionRouter.get('/publish', isAuthenticated, (req, res) => {

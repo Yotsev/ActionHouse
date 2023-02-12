@@ -1,7 +1,7 @@
 const Action = require('../models/Action');
 
 exports.getAllAds = async()=> {
-    const ads = await Action.find({});
+    const ads = await Action.find({}).lean();
 
     return ads;
 };
