@@ -20,11 +20,12 @@
             <nav class="main-nav nav-mid">
                 <ul>
                     <li>
-                        <a href="#">Browse</a>
+                        <a href="/action/browse">Browse</a>
                     </li>
+                    {{#if isAuthenticated}}
                     <!-- User actions -->
                     <li class="user">
-                        <a href="#">Publish</a>
+                        <a href="/action/publish">Publish</a>
                     </li>
 
                     <!-- Bonus action -->
@@ -35,15 +36,17 @@
                     -->
 
                     <li class="user">
-                        <a href="#">Logout</a>
+                        <a href="/auth/logout">Logout</a>
                     </li>
+                    {{else}}
                     <!-- Guest actions -->
                     <li class="guest">
-                        <a href="#">Register</a>
+                        <a href="/auth/register">Register</a>
                     </li>
                     <li class="guest">
-                        <a href="#">Login</a>
+                        <a href="/auth/login">Login</a>
                     </li>
+                    {{/if}}
                 </ul>
             </nav>
         </header>

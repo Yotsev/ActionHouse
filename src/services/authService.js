@@ -11,28 +11,28 @@ exports.getExistingUser = async (username, email) => {
     return existingUser;
 };
 
-exports.register = async (username, email, password, repeatPassword) => {
-    const passwordLenght = 4;
+exports.register = async (user) => {
+    const passwordLenght = 5;
 
-    const existingUser = await this.getExistingUser(username, email);
+    const existingUser = await this.getUserByEmail(user.email);
 
     if (existingUser) {
         throw new Error('User exists');
     }
 
-    if (password.length < 4) {
-        throw new Error('Password must be at least 4 characters long');
+    if (user.password.length < passwordLenght) {
+        throw new Error('Password must be at least 5 characters long');
     }
 
-    if (password !== repeatPassword) {
+    if (user.password !== user.rePassword) {
         throw new Error('Password mismatch');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(user.password, 10);
 
-    await User.create({ username, email, password: hashedPassword });
+    await User.create({ ...user, password:hashedPassword });
 
-    return this.login(email, password);
+    return this.login(user.email, user.password);
 };
 
 exports.login = async (email, password) => {

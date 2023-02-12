@@ -6,15 +6,15 @@ const userSchema = new mongoose.Schema({
         required: [true,'Email is rerequired'],
         validate: [/^[A-Za-z]+@[A-Za-z]+.[A-Za-z]+$/,'Email must contain only latin letters'],
     },
-    fistName: {
+    firstName: {
         type: String,
         required: [true,'First name is rerequired'],
-        minLength: [11, 'First name must be at least 1 characters long'],
+        minLength: [1, 'First name must be at least 1 characters long'],
 
     },
     lastName: {
         type: String,
-        required: true,
+        required: [true,'Last name is rerequired'],
         minLength: [1, 'Lirst name must be at least 1 characters long'],
     },
     password: {
