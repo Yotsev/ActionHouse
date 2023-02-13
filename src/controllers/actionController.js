@@ -37,20 +37,26 @@ actionRouter.post('/publish', isAuthenticated, async (req, res) => {
 });
 
 actionRouter.get('/:id/details', async (req, res) => {
-    let isAuthor, isTopBidder;
+    let isAuthor, isTopBidder, hasBidder;
     const ad = await actionService.getAdById(req.params.id);
+    const bidder = ad.bidder;
     const isUser = req.user;
-
+   
     if (isUser) {
         isAuthor = ad.author._id == req.user._id;
-        isTopBidder = ad.bidder == req.user._id;
+        isTopBidder = !(ad.bidder == req.user._id);
     }
 
     if (isAuthor) {
-        return res.render('action/details-owner',);
-    } else {
 
-        return res.render('action/details', { isUser, isTopBidder, isTopBidder });
+        if (bidder) {
+            hasBidder = true;
+        }
+
+        return res.render('action/details-owner', {hasBidder, bidder, ad});
+    } else {
+        
+        return res.render('action/details', { isUser, isTopBidder, ad });
     }
 });
 
