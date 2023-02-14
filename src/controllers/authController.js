@@ -1,21 +1,14 @@
 const authController = require('express').Router();
 const authService = require('../services/authService');
-const { parseError } = require('../utils/errorParser');
+const { getErrorMessage } = require('../utils/errorParser');
 
 authController.get('/register', (req, res) => {
     res.render('auth/register');
 });
 
 authController.post('/register', async (req, res) => {
-    const user = {
-        email: req.body.email,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        password: req.body.password,
-        rePassword: req.body.rePassword,
-    };
+    const user = req.body;
 
-    console.log(user);
     try {
         const token = await authService.register(user);
 
@@ -23,7 +16,7 @@ authController.post('/register', async (req, res) => {
         res.redirect('/');
     } catch (err) {
         console.log(err);
-        return res.status(400).render('auth/register', {errors: parseError(err)});
+        return res.status(400).render('auth/register', {error: getErrorMessage(err)});
     }
 });
 
@@ -33,14 +26,14 @@ authController.get('/login', (req, res) => {
 
 authController.post('/login', async (req, res) => {
     const { email, password } = req.body;
-
+    
     try {
         const token = await authService.login(email, password);
         
         res.cookie('auth', token);
         res.redirect('/');
     } catch (err) {
-        return res.status(404).render('auth/login', { errors: parseError(err) });
+        return res.status(400).render('auth/login', { error: getErrorMessage(err) });
     }
 });
 

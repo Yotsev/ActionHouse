@@ -22,6 +22,7 @@
                     <li>
                         <a href="#">Browse</a>
                     </li>
+                    {{#if isAuthenticated}}
                     <!-- User actions -->
                     <li class="user">
                         <a href="#">Publish</a>
@@ -35,18 +36,28 @@
                     -->
 
                     <li class="user">
-                        <a href="#">Logout</a>
+                        <a href="/auth/logout">Logout</a>
                     </li>
+                    {{else}}
                     <!-- Guest actions -->
                     <li class="guest">
-                        <a href="#">Register</a>
+                        <a href="/auth/register">Register</a>
                     </li>
                     <li class="guest">
-                        <a href="#">Login</a>
+                        <a href="/auth/login">Login</a>
                     </li>
+                    {{/if}}
                 </ul>
             </nav>
         </header>
+        <!-- In case of error, display the following div-->
+            
+            {{#if error}}
+            <div class="error-box">
+                <p>{{error}}</p>
+            </div>
+            {{/if}}
+
         {{{body}}}
 
         <footer>SoftUni &copy; 2022 | Design by Viktor Kostadinov</footer>
