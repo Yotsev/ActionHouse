@@ -7,7 +7,7 @@ const { getCategoriesViewData } = require('../utils/actionsUtils');
 const { getErrorMessage } = require('../utils/errorParser');
 
 actionRouter.get('/browse', async (req, res) => {
-    const actions = await actionService.getAll();
+    const actions = await actionService.getAllActive();
     res.render('action/browse', { actions });
 });
 
@@ -43,18 +43,20 @@ actionRouter.get('/:actionId/details', async (req, res) => {
     if (isAuthor) {
         return res.render('action/details-owner', { action, bidder })
     }
+
     if (action.bidder?._id == req.user?._id) {
         topBidder = true;
     }
+
     res.render('action/details', { action, topBidder });
 });
 
 actionRouter.get('/:actionid/edit', isAuthenticated, async (req, res) => {
     const action = await actionService.getOne(req.params.actionid);
     const isAuthor = action.author._id == req.user._id;
-    
+
     if (!isAuthor) {
-        return res.redirect(`/404`);
+        return res.redirect(`/`);
     }
 
     const categories = getCategoriesViewData(action.category);
@@ -71,7 +73,7 @@ actionRouter.post('/:actionid/edit', isAuthenticated, async (req, res) => {
     const categories = getCategoriesViewData(action.category);
 
     if (action.author._id != req.user._id) {
-        return res.redirect('/404');
+        return res.redirect('/');
     }
 
     try {
@@ -87,7 +89,7 @@ actionRouter.get('/:actionid/delete', isAuthenticated, async (req, res) => {
     const action = await actionService.getOne(req.params.actionid);
 
     if (action.author._id != req.user._id) {
-        return res.redirect('/404');
+        return res.redirect('/');
     }
 
     await actionService.delete(req.params.actionid);
@@ -120,6 +122,24 @@ actionRouter.post('/:actionId/bid', isAuthenticated, async (req, res) => {
     await actionService.placeBid(req.params.actionId, req.user._id, bid);
 
     res.redirect(`/action/${req.params.actionId}/details`);
+});
+
+actionRouter.get('/closed-actions', isAuthenticated, async (req, res) => {
+    const actions = await actionService.getAllInactive();
+
+    res.render('action/closed-auctions', { actions });
+});
+
+actionRouter.get('/:actionId/close', isAuthenticated, async (req, res)=> {
+    const action = await actionService.getOne(req.params.actionId);
+
+    if (action.author._id != req.user._id || !action.bidder) {
+        return res.redirect('/');
+    }
+    
+    await actionService.closeAction(req.params.actionId);
+
+    res.redirect('/action/closed-actions');
 });
 
 module.exports = actionRouter;

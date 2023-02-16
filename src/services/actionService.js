@@ -1,6 +1,8 @@
 const Action = require('../models/Auction');
 
-exports.getAll = () => Action.find({}).lean();
+exports.getAllActive = () => Action.find({isClosed:false}).lean();
+
+exports.getAllInactive = () => Action.find({isClosed:true}).lean();
 
 exports.publish = (userId, actionData) => Action.create({ ...actionData, author: userId });
 
@@ -18,3 +20,5 @@ exports.placeBid = async (actionId, bidderId, bid) => {
 
     await action.save();
 }
+
+exports.closeAction = async (actionId)=> Action.findByIdAndUpdate(actionId, {isClosed:true});

@@ -34,6 +34,10 @@ const actionSchema = new mongoose.Schema({
     bidder: {
         type: mongoose.Types.ObjectId,
         ref: 'User'
+    },
+    isClosed: {
+        type: Boolean,
+        default: false
     }
 });
 
