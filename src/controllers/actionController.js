@@ -36,15 +36,24 @@ actionRouter.post('/publish', isAuthenticated, async (req, res) => {
 actionRouter.get('/:actionId/details', async (req, res) => {
     const action = await actionService.getOne(req.params.actionId);
     action.category = categoriesMap[action.category];
-   
+
     const isAuthor = action.author._id == req.user?._id;
     const hasBidder = action.bidder;
-    
+
     if (isAuthor) {
         return res.render('action/details-owner', { action, hasBidder })
     }
 
     res.render('action/details', { action });
+});
+
+actionRouter.get('/:actionid/edit', async (req, res) => {
+    const action = await actionService.getOne(req.params.actionid);
+    
+    const categories = getCategoriesViewData(action.category);
+    const hasBidder = action.bidder
+    
+    res.render('action/edit', { action, categories, hasBidder });
 });
 
 module.exports = actionRouter;
