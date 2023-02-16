@@ -21,8 +21,6 @@ actionRouter.post('/publish', isAuthenticated, async (req, res) => {
     const actionData = req.body;
     const categories = getCategoriesViewData();
 
-    console.log(actionData);
-
     try {
         await actionService.publish(req.user._id, actionData);
     } catch (err) {
@@ -34,39 +32,48 @@ actionRouter.post('/publish', isAuthenticated, async (req, res) => {
 });
 
 actionRouter.get('/:actionId/details', async (req, res) => {
+    let topBidder = false;
+
     const action = await actionService.getOne(req.params.actionId);
     action.category = categoriesMap[action.category];
 
     const isAuthor = action.author._id == req.user?._id;
-    const hasBidder = action.bidder;
+    const bidder = action.bidder;
 
     if (isAuthor) {
-        return res.render('action/details-owner', { action, hasBidder })
+        return res.render('action/details-owner', { action, bidder })
     }
-
-    res.render('action/details', { action });
+    if (action.bidder?._id == req.user?._id) {
+        topBidder = true;
+    }
+    res.render('action/details', { action, topBidder });
 });
 
 actionRouter.get('/:actionid/edit', isAuthenticated, async (req, res) => {
     const action = await actionService.getOne(req.params.actionid);
     const isAuthor = action.author._id == req.user._id;
-
+    let hasBidder = false;
+    
     if (!isAuthor) {
         return res.redirect(`/404`);
     }
 
     const categories = getCategoriesViewData(action.category);
-    const hasBidder = action.bidder
+    const bidder = action.bidder
+
+    if (bidder) {
+        hasBidder = true;
+    }
 
     res.render('action/edit', { action, categories, hasBidder });
 });
 
 actionRouter.post('/:actionid/edit', isAuthenticated, async (req, res) => {
     const actionData = req.body;
-    
+
     const action = await actionService.getOne(req.params.actionid);
     const categories = getCategoriesViewData(action.category);
-    
+
     if (action.author._id != req.user._id) {
         return res.redirect('/404');
     }
@@ -78,6 +85,45 @@ actionRouter.post('/:actionid/edit', isAuthenticated, async (req, res) => {
     }
 
     res.redirect(`/action/${req.params.actionid}/details`);
+});
+
+actionRouter.get('/:actionid/delete', isAuthenticated, async (req, res) => {
+    const action = await actionService.getOne(req.params.actionid);
+
+    if (action.author._id != req.user._id) {
+        return res.redirect('/404');
+    }
+
+    await actionService.delete(req.params.actionid);
+
+    res.redirect('/action/browse');
+});
+
+actionRouter.post('/:actionId/bid', isAuthenticated, async (req, res) => {
+    const action = await actionService.getOne(req.params.actionId);
+    action.category = categoriesMap[action.category];
+
+    const bid = req.body.bid
+
+    try {
+        if (action.author._id == req.user._id) {
+            throw new Error(`Can't place bid on own action`);
+        }
+
+        if (action.price >= bid) {
+            throw new Error(`Bid can't be lower or equal to current price`);
+        }
+
+        await actionService.placeBid(req.params.actionId, req.user._id, bid);
+
+    } catch (err) {
+        console.log(err);
+        return res.status(400).render('action/details', { action, error: getErrorMessage(err) });
+    };
+
+    await actionService.placeBid(req.params.actionId, req.user._id, bid);
+
+    res.redirect(`/action/${req.params.actionId}/details`);
 });
 
 module.exports = actionRouter;

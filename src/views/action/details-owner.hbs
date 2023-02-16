@@ -29,9 +29,9 @@
                         </div>
 
                         <div>
-                            {{#if hasBidder}}
+                            {{#if bidder}}
                             <!-- If there is a bidder -->
-                            Bid by <strong>John Maclane</strong>
+                            Bid by <strong>{{bidder.firstName}} {{bidder.lastName}}</strong>
                             {{else}}
                             <!-- # Bonus: If there is a bidder --><!--
 

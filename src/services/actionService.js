@@ -6,4 +6,15 @@ exports.publish = (userId, actionData) => Action.create({ ...actionData, author:
 
 exports.getOne = (actionId) => Action.findById(actionId).populate('author bidder').lean();
 
-exports.edit = async (actionId, actionData) => Action.findByIdAndUpdate(actionId, actionData, {runValidators: true});
+exports.edit = (actionId, actionData) => Action.findByIdAndUpdate(actionId, actionData, { runValidators: true });
+
+exports.delete = (actionId) => Action.findByIdAndDelete(actionId);
+
+exports.placeBid = async (actionId, bidderId, bid) => {
+    const action = await Action.findById(actionId);
+
+    action.bidder = bidderId;
+    action.price = bid;
+
+    await action.save();
+}
