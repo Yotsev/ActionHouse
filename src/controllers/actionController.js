@@ -47,13 +47,37 @@ actionRouter.get('/:actionId/details', async (req, res) => {
     res.render('action/details', { action });
 });
 
-actionRouter.get('/:actionid/edit', async (req, res) => {
+actionRouter.get('/:actionid/edit', isAuthenticated, async (req, res) => {
     const action = await actionService.getOne(req.params.actionid);
-    
+    const isAuthor = action.author._id == req.user._id;
+
+    if (!isAuthor) {
+        return res.redirect(`/404`);
+    }
+
     const categories = getCategoriesViewData(action.category);
     const hasBidder = action.bidder
-    
+
     res.render('action/edit', { action, categories, hasBidder });
+});
+
+actionRouter.post('/:actionid/edit', isAuthenticated, async (req, res) => {
+    const actionData = req.body;
+    
+    const action = await actionService.getOne(req.params.actionid);
+    const categories = getCategoriesViewData(action.category);
+    
+    if (action.author._id != req.user._id) {
+        return res.redirect('/404');
+    }
+
+    try {
+        await actionService.edit(req.params.actionid, actionData);
+    } catch (err) {
+        return res.status(400).render(`action/edit`, { action, categories, error: getErrorMessage(err) });
+    }
+
+    res.redirect(`/action/${req.params.actionid}/details`);
 });
 
 module.exports = actionRouter;
