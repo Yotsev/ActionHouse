@@ -2,7 +2,7 @@ const Action = require('../models/Auction');
 
 exports.getAllActive = () => Action.find({isClosed:false}).lean();
 
-exports.getAllInactive = () => Action.find({isClosed:true}).lean();
+exports.getAllInactive = () => Action.find({isClosed:true}).populate('bidder').lean();
 
 exports.publish = (userId, actionData) => Action.create({ ...actionData, author: userId });
 
