@@ -52,18 +52,14 @@ actionRouter.get('/:actionId/details', async (req, res) => {
 actionRouter.get('/:actionid/edit', isAuthenticated, async (req, res) => {
     const action = await actionService.getOne(req.params.actionid);
     const isAuthor = action.author._id == req.user._id;
-    let hasBidder = false;
     
     if (!isAuthor) {
         return res.redirect(`/404`);
     }
 
     const categories = getCategoriesViewData(action.category);
-    const bidder = action.bidder
+    const hasBidder = Boolean(action.bidder);
 
-    if (bidder) {
-        hasBidder = true;
-    }
 
     res.render('action/edit', { action, categories, hasBidder });
 });
