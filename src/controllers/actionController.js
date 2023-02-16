@@ -1,5 +1,6 @@
 const actionRouter = require('express').Router();
 
+const { categoriesMap } = require('../constants');
 const { isAuthenticated } = require('../middlewares/authMiddleware');
 const actionService = require('../services/actionService');
 const { getCategoriesViewData } = require('../utils/actionsUtils');
@@ -30,6 +31,20 @@ actionRouter.post('/publish', isAuthenticated, async (req, res) => {
     }
 
     res.redirect('/action/browse');
+});
+
+actionRouter.get('/:actionId/details', async (req, res) => {
+    const action = await actionService.getOne(req.params.actionId);
+    action.category = categoriesMap[action.category];
+   
+    const isAuthor = action.author._id == req.user?._id;
+    const hasBidder = action.bidder;
+    
+    if (isAuthor) {
+        return res.render('action/details-owner', { action, hasBidder })
+    }
+
+    res.render('action/details', { action });
 });
 
 module.exports = actionRouter;
